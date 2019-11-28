@@ -1,9 +1,9 @@
 [package]
 name = "iced"
-version = "0.1.0-alpha"
+version = "0.1.0-beta"
 authors = ["Héctor Ramón Jiménez <hector0193@gmail.com>"]
 edition = "2018"
-description = "A GUI runtime, heavily inspired by Elm."
+description = "A cross-platform GUI library inspired by Elm"
 license = "MIT"
 repository = "https://github.com/hecrj/iced"
 documentation = "https://docs.rs/iced"
@@ -11,18 +11,34 @@ readme = "README.md"
 keywords = ["gui", "ui", "graphics", "interface", "widgets"]
 categories = ["gui"]
 
+[features]
+# Enables a debug view in native platforms (press F12)
+debug = ["iced_winit/debug"]
+
 [badges]
 maintenance = { status = "actively-developed" }
 
-[package.metadata.docs.rs]
-features = ["winit"]
+[workspace]
+members = [
+    "core",
+    "native",
+    "web",
+    "wgpu",
+    "winit",
+]
 
-[dependencies]
-stretch = "0.2"
-twox-hash = "1.5"
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+iced_winit = { version = "0.1.0-alpha", path = "winit" }
+iced_wgpu = { version = "0.1.0", path = "wgpu" }
 
-# Enable to obtain conversion traits
-winit = { version = "0.20.0-alpha3", optional = true }
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+iced_web = { version = "0.1.0", path = "web" }
 
 [dev-dependencies]
-ggez = { version = "0.5", git = "https://github.com/hecrj/ggez.git" }
+env_logger = "0.7"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+directories = "2.0"
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen = "0.2.51"

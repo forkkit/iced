@@ -1,0 +1,15 @@
+[package]
+name = "iced_core"
+version = "0.1.0"
+authors = ["Héctor Ramón Jiménez <hector0193@gmail.com>"]
+edition = "2018"
+description = "The essential concepts of Iced"
+license = "MIT"
+repository = "https://github.com/hecrj/iced"
+
+[features]
+# Exposes a future-based `Command` type
+command = ["futures"]
+
+[dependencies]
+futures = { version = "0.3", optional = true }

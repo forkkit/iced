@@ -1,21 +1,41 @@
-//! Iced is a renderer-agnostic GUI library focused on simplicity and
-//! type-safety. Inspired by [Elm].
+//! Iced is a cross-platform GUI library focused on simplicity and type-safety.
+//! Inspired by [Elm].
 //!
 //! # Features
-//!   * Simple, easy-to-use, renderer-agnostic API
-//!   * Responsive, flexbox-based layouting
-//!   * Type-safe, reactive programming model
-//!   * Built-in widgets
-//!   * Custom widget support
+//! * Simple, easy-to-use, batteries-included API
+//! * Type-safe, reactive programming model
+//! * [Cross-platform support] (Windows, macOS, Linux, and the Web)
+//! * Responsive layout
+//! * Built-in widgets (including [text inputs], [scrollables], and more!)
+//! * Custom widget support (create your own!)
+//! * [Debug overlay with performance metrics]
+//! * First-class support for async actions (use futures!)
+//! * [Modular ecosystem] split into reusable parts:
+//!   * A [renderer-agnostic native runtime] enabling integration with existing
+//!     systems
+//!   * A [built-in renderer] supporting Vulkan, Metal, DX11, and DX12
+//!   * A [windowing shell]
+//!   * A [web runtime] leveraging the DOM
 //!
 //! Check out the [repository] and the [examples] for more details!
 //!
-//! [examples]: https://github.com/hecrj/iced/tree/0.1.0/examples
+//! [Cross-platform support]: https://github.com/hecrj/iced/blob/master/docs/images/todos_desktop.jpg?raw=true
+//! [text inputs]: https://gfycat.com/alertcalmcrow-rust-gui
+//! [scrollables]: https://gfycat.com/perkybaggybaboon-rust-gui
+//! [Debug overlay with performance metrics]: https://gfycat.com/incredibledarlingbee
+//! [Modular ecosystem]: https://github.com/hecrj/iced/blob/master/ECOSYSTEM.md
+//! [renderer-agnostic native runtime]: https://github.com/hecrj/iced/tree/master/native
+//! [`wgpu`]: https://github.com/gfx-rs/wgpu-rs
+//! [built-in renderer]: https://github.com/hecrj/iced/tree/master/wgpu
+//! [windowing shell]: https://github.com/hecrj/iced/tree/master/winit
+//! [`dodrio`]: https://github.com/fitzgen/dodrio
+//! [web runtime]: https://github.com/hecrj/iced/tree/master/web
+//! [examples]: https://github.com/hecrj/iced/tree/master/examples
 //! [repository]: https://github.com/hecrj/iced
 //!
-//! # Usage
-//! Inspired by [The Elm Architecture], Iced expects you to split user interfaces
-//! into four different concepts:
+//! # Overview
+//! Inspired by [The Elm Architecture], Iced expects you to split user
+//! interfaces into four different concepts:
 //!
 //!   * __State__ — the state of your application
 //!   * __Messages__ — user interactions or meaningful events that you care
@@ -25,8 +45,8 @@
 //!   * __Update logic__ — a way to react to __messages__ and update your
 //!   __state__
 //!
-//! We can build something to see how this works! Let's say we want a simple counter
-//! that can be incremented and decremented using two buttons.
+//! We can build something to see how this works! Let's say we want a simple
+//! counter that can be incremented and decremented using two buttons.
 //!
 //! We start by modelling the __state__ of our application:
 //!
@@ -75,65 +95,26 @@
 //! #     DecrementPressed,
 //! # }
 //! #
-//! # mod iced_wgpu {
-//! #     use iced::{
-//! #         button, text, text::HorizontalAlignment, text::VerticalAlignment,
-//! #         MouseCursor, Node, Point, Rectangle, Style,
-//! #     };
-//! #
-//! #     pub struct Renderer {}
-//! #
-//! #     impl button::Renderer for Renderer {
-//! #         fn draw(
-//! #             &mut self,
-//! #             _cursor_position: Point,
-//! #             _bounds: Rectangle,
-//! #             _state: &button::State,
-//! #             _label: &str,
-//! #             _class: button::Class,
-//! #         ) -> MouseCursor {
-//! #             MouseCursor::OutOfBounds
-//! #         }
-//! #     }
-//! #
-//! #     impl text::Renderer<[f32; 4]> for Renderer {
-//! #         fn node(&self, style: Style, _content: &str, _size: Option<u16>) -> Node {
-//! #             Node::new(style)
-//! #         }
-//! #
-//! #         fn draw(
-//! #             &mut self,
-//! #             _bounds: Rectangle,
-//! #             _content: &str,
-//! #             _size: Option<u16>,
-//! #             _color: Option<[f32; 4]>,
-//! #             _horizontal_alignment: HorizontalAlignment,
-//! #             _vertical_alignment: VerticalAlignment,
-//! #         ) {
-//! #         }
-//! #     }
-//! # }
 //! use iced::{Button, Column, Text};
-//! use iced_wgpu::Renderer; // Iced does not include a renderer! We need to bring our own!
 //!
 //! impl Counter {
-//!     pub fn view(&mut self) -> Column<Message, Renderer> {
+//!     pub fn view(&mut self) -> Column<Message> {
 //!         // We use a column: a simple vertical layout
 //!         Column::new()
 //!             .push(
 //!                 // The increment button. We tell it to produce an
 //!                 // `IncrementPressed` message when pressed
-//!                 Button::new(&mut self.increment_button, "+")
+//!                 Button::new(&mut self.increment_button, Text::new("+"))
 //!                     .on_press(Message::IncrementPressed),
 //!             )
 //!             .push(
 //!                 // We show the value of the counter here
-//!                 Text::new(&self.value.to_string()).size(50),
+//!                 Text::new(self.value.to_string()).size(50),
 //!             )
 //!             .push(
 //!                 // The decrement button. We tell it to produce a
 //!                 // `DecrementPressed` message when pressed
-//!                 Button::new(&mut self.decrement_button, "-")
+//!                 Button::new(&mut self.decrement_button, Text::new("-"))
 //!                     .on_press(Message::DecrementPressed),
 //!             )
 //!     }
@@ -176,54 +157,37 @@
 //! }
 //! ```
 //!
-//! And that's everything! We just wrote a whole user interface. Iced is now able
-//! to:
+//! And that's everything! We just wrote a whole user interface. Iced is now
+//! able to:
 //!
 //!   1. Take the result of our __view logic__ and layout its widgets.
 //!   1. Process events from our system and produce __messages__ for our
 //!      __update logic__.
-//!   1. Draw the resulting user interface using our chosen __renderer__.
+//!   1. Draw the resulting user interface.
 //!
-//! Check out the [`UserInterface`] type to learn how to wire everything up!
+//! # Usage
+//! Take a look at the [`Application`] trait, which streamlines all the process
+//! described above for you!
 //!
 //! [Elm]: https://elm-lang.org/
 //! [The Elm Architecture]: https://guide.elm-lang.org/architecture/
 //! [documentation]: https://docs.rs/iced
 //! [examples]: https://github.com/hecrj/iced/tree/master/examples
-//! [`UserInterface`]: struct.UserInterface.html
+//! [`Application`]: trait.Application.html
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![deny(unused_results)]
 #![deny(unsafe_code)]
 #![deny(rust_2018_idioms)]
-pub mod input;
-pub mod renderer;
-pub mod widget;
+mod application;
+#[cfg_attr(target_arch = "wasm32", path = "web.rs")]
+#[cfg_attr(not(target_arch = "wasm32"), path = "native.rs")]
+mod platform;
+mod sandbox;
 
-mod element;
-mod event;
-mod hasher;
-mod layout;
-mod mouse_cursor;
-mod node;
-mod point;
-mod rectangle;
-mod style;
-mod user_interface;
-mod vector;
+pub mod settings;
 
-#[doc(no_inline)]
-pub use stretch::{geometry::Size, number::Number};
-
-pub use element::Element;
-pub use event::Event;
-pub use hasher::Hasher;
-pub use layout::Layout;
-pub use mouse_cursor::MouseCursor;
-pub use node::Node;
-pub use point::Point;
-pub use rectangle::Rectangle;
-pub use style::{Align, Justify, Style};
-pub use user_interface::{Cache, UserInterface};
-pub(crate) use vector::Vector;
-pub use widget::*;
+pub use application::Application;
+pub use platform::*;
+pub use sandbox::Sandbox;
+pub use settings::Settings;
